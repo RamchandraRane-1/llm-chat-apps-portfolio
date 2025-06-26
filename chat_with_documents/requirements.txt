@@ -1,0 +1,13 @@
+streamlit==1.32.2
+streamlit-chat==0.1.1
+langchain==0.1.13
+openai==1.14.2
+langchain-openai==0.1.0
+
+faiss-cpu
+unstructured
+pypdf
+python-docx
+pandas
+altair
+openpyxl
