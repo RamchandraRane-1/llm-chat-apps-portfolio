@@ -10,6 +10,12 @@ import pandas as pd
 import altair as alt
 import os
 import tempfile
+import logging
+import time
+import openai
+
+# Logging setup
+logging.basicConfig(filename='chatbot_log.txt', level=logging.INFO, format='%(asctime)s - %(message)s')
 
 # Session state
 if 'chat_history' not in st.session_state:
@@ -73,14 +79,32 @@ if uploaded_file:
             return_source_documents=True
         )
 
+# Retry mechanism
+def robust_invoke(llm, prompt, retries=3):
+    for attempt in range(retries):
+        try:
+            return llm.invoke(prompt).content
+        except Exception as e:
+            logging.error(f"OpenAI API Error: {e}")
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)
+            else:
+                return f"OpenAI API error: {e}"
+
 # Get chatbot response
 @st.cache_data(show_spinner=False)
 def get_response(user_input):
     conversation = st.session_state['conversation']
     chat_history = st.session_state['chat_history']
-    result = conversation({"question": user_input, "chat_history": chat_history})
-    chat_history.append((user_input, result["answer"]))
-    return result["answer"]
+    try:
+        result = conversation({"question": user_input, "chat_history": chat_history})
+        chat_history.append((user_input, result["answer"]))
+        logging.info(f"User: {user_input}")
+        logging.info(f"Bot: {result['answer']}")
+        return result["answer"]
+    except Exception as e:
+        logging.error(f"Error in conversation: {e}")
+        return f"Error during response generation: {e}"
 
 # UI Input + Response
 response_container = st.container()
@@ -93,6 +117,7 @@ with container:
 
         if submit_button and user_input:
             st.session_state['messages'].append(user_input)
+            logging.info(f"User input: {user_input}")
             if st.session_state['conversation']:
                 model_response = get_response(user_input)
             elif st.session_state['raw_df'] is not None:
@@ -106,16 +131,15 @@ with container:
                 sample_data = df.head(5).to_dict(orient="records")
                 context += f" Here are the first 5 rows: {sample_data}."
                 prompt = (
-    f"Given this dataset context:\n{context}\n\n"
-    f"Now answer the user's question in a helpful and well-explained manner:\n{user_input}"
-)
-
-                response = llm.invoke(prompt)
-                model_response = response.content
+                    f"Given this dataset context:\n{context}\n\n"
+                    f"Now answer the user's question in a helpful and well-explained manner:\n{user_input}"
+                )
+                model_response = robust_invoke(llm, prompt)
             else:
                 model_response = "Please upload a valid file and provide an API key."
 
             st.session_state['messages'].append(model_response)
+            logging.info(f"Model response: {model_response}")
 
 with response_container:
     for i, msg in enumerate(st.session_state['messages']):
