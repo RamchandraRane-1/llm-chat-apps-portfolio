@@ -12,7 +12,7 @@ This repository contains a collection of AI-driven chat applications and tools b
 - **📁 chat_with_documents**  
   Upload a file (PDF, DOCX, TXT, etc.) and chat with its contents using vector-based retrieval and LLMs.
 
-- **📁 docuvisionbot** 🔥 *(New)*  
+- **📁 docuvisionbot**
   Multimodal chatbot that answers questions by analyzing **both text and images** in **PDF, PPTX, DOCX** files using **Gemini Vision API** and **OpenAI GPT**.
 
 - **📁 chatgpt_role_assistant**  
