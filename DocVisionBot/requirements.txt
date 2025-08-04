@@ -1,0 +1,10 @@
+streamlit
+langchain
+openai
+PyPDF2
+python-pptx
+python-docx
+pdf2image
+Pillow
+google-generativeai
+faiss-cpu
