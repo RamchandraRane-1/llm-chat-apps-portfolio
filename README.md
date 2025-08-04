@@ -1,4 +1,4 @@
-# 🤖 AI-Powered Chat Applications
+# AI-Powered Chat Applications
 
 This repository contains a collection of AI-driven chat applications and tools built using **Python**, **LangChain**, **Streamlit**, **OpenAI**, and **Gemini APIs**. Each app focuses on a different real-world use case—ranging from document intelligence to role-based assistants and memory-powered conversations.
 
